@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package logic_server;
+option java_package = "com.zxc.proto";
+option java_outer_classname = "LoginServer";
+
+/**
+ * 心跳
+ * @proto Heart = 100;
+ * @down HeartDown
+ * @repeat
+ */
+message HeartDown {
+	int64 t = 1;//系统时间
+}
