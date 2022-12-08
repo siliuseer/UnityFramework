@@ -90,3 +90,4 @@ crashlytics-build.properties
 
 /[Aa]ssets/[Aa]utoGen/*
 /[Aa]ssets/[Aa]utoGen.meta
+Packages/packages-lock.json
