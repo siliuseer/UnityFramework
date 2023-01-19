@@ -1,41 +1,54 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.InteropServices;
 using UnityEditor;
-using UnityEngine;
 
 namespace siliu
 {
     public class ProtobufEditor
     {
-        [MenuItem("Tools/Compile Proto")]
+        [MenuItem("Tools/编译Protobuf")]
         private static void Compile()
         {
-            var protoDir = Path.Combine(Environment.CurrentDirectory, "ext/protobuf");
+            var projRoot = Environment.CurrentDirectory;
+            var protoDir = Path.Combine(projRoot, "ext/protobuf");
             if (!Directory.Exists(protoDir))
             {
                 return;
             }
+
             var files = Directory.GetFiles(protoDir, "*.proto", SearchOption.AllDirectories);
             if (files.Length == 0)
             {
                 return;
             }
+            var list = new List<string>();
+            foreach (var file in files)
+            {
+                if (Path.GetFileNameWithoutExtension(file).StartsWith("http_"))
+                {
+                    continue;
+                }
+                list.Add(file);
+            }
             
             var protoc = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "protoc.exe" : "protoc";
-            protoc = Path.Combine(Application.dataPath, "Editor/Protobuf/protoc", protoc);
-            var codeDir = Path.Combine(Application.dataPath, "AutoGen/proto");
+            protoc = Path.Combine(projRoot, "Assets/Third/Protobuf/Editor/protoc", protoc).Replace('\\', '/');
+            var codeDir = Path.Combine(projRoot, "Assets/Scripts/auto/proto").Replace('\\', '/');
             if (!Directory.Exists(codeDir))
             {
                 Directory.CreateDirectory(codeDir);
             }
-            RunCmd(protoc, $"--csharp_out=\"{codeDir}\" --proto_path=\"{protoDir}\" {string.Join(" ", files)}");
+            RunCmd(protoc, $"--csharp_out=\"{codeDir}\" --proto_path=\"{protoDir}\" {string.Join(" ", list)}");
             UnityEngine.Debug.Log("Compile proto files finish");
+            RunCmd("python", "tools/build_proto.py");
+            UnityEngine.Debug.Log("Gen proto code finish");
             AssetDatabase.Refresh();
         }
 
-        public static Process RunCmd(string cmd, string args, string workDir = ".", bool waitExit = true)
+        private static Process RunCmd(string cmd, string args, string workDir = ".", bool waitExit = true)
         {
             try
             {

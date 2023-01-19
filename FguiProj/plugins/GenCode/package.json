@@ -1,0 +1,11 @@
+{
+  "name": "com.siliu.plugin.gencode",
+  "displayName": "发布代码",
+  "description": "自定义代码逻辑",
+  "version": "1.0",
+  "author": {
+    "name": "siliu"
+  },
+  "icon": "icon.png",
+  "main": "main.js"
+}

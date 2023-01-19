@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="337rf71s">
+  <resources>
+    <component id="c0x40" name="Login.xml" path="/" exported="true"/>
+    <component id="c0x41" name="SaveCode.xml" path="/comps/"/>
+    <image id="c0x42" name="Ellipse 1.png" path="/imgs/"/>
+    <image id="c0x43" name="Vector.png" path="/imgs/"/>
+    <component id="c0x44" name="LoginBtn.xml" path="/comps/"/>
+    <component id="c0x45" name="BtnClear.xml" path="/comps/"/>
+    <image id="c0x46" name="Close01.png" path="/imgs/"/>
+  </resources>
+  <publish name=""/>
+</packageDescription>

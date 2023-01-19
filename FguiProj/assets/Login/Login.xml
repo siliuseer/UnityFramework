@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="1000,603">
+  <displayList>
+    <graph id="n1_ipus" name="n1" xy="0,0" size="1000,603" type="rect" lineColor="#ffd3d7de" corner="10">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <text id="n0_ipus" name="n0" xy="212,46" size="576,59" fontSize="44" color="#ff6699" text="输入房间号和密钥后开始游戏">
+      <relation target="" sidePair="center-center"/>
+    </text>
+    <component id="n2_ipus" name="BtnSave" src="c0x41" fileName="comps/SaveCode.xml" xy="350,509"/>
+    <component id="n3_ipus" name="BtnLogin" src="c0x44" fileName="comps/LoginBtn.xml" xy="351,389"/>
+    <graph id="n10_ipus" name="n10" xy="112,145" size="775,82" group="n9_ipus" aspect="true" type="rect" lineColor="#ffe3e5e7" fillColor="#00ffffff" corner="4"/>
+    <graph id="n8_ipus" name="n8" xy="113,146" size="165,80" group="n17_gyx5" aspect="true" type="rect" lineColor="#ffe3e5e7" fillColor="#fff6f7f8" corner="4"/>
+    <text id="n5_ipus" name="n5" xy="139,161" size="112,49" group="n17_gyx5" fontSize="36" color="#323232" text="房间号"/>
+    <group id="n17_gyx5" name="n17" xy="113,146" size="165,80" group="n9_ipus"/>
+    <text id="n6_ipus" name="InputCode" xy="286,161" size="525,49" group="n9_ipus" fontSize="36" color="#323232" vAlign="middle" autoSize="none" text="" input="true" prompt="[color=#C9CCD0]请输入房间号[/color]"/>
+    <component id="n7_ipus" name="BtnClear" src="c0x45" fileName="comps/BtnClear.xml" xy="825,161" group="n9_ipus"/>
+    <group id="n9_ipus" name="n9" xy="112,145" size="775,82"/>
+    <graph id="n18_ee78" name="n18" xy="112,267" size="775,82" group="n24_ee78" aspect="true" type="rect" lineColor="#ffe3e5e7" fillColor="#00ffffff" corner="4"/>
+    <graph id="n19_ee78" name="n19" xy="113,268" size="165,80" group="n21_ee78" aspect="true" type="rect" lineColor="#ffe3e5e7" fillColor="#fff6f7f8" corner="4"/>
+    <text id="n20_ee78" name="n20" xy="158,283" size="76,49" group="n21_ee78" fontSize="36" color="#323232" text="密钥"/>
+    <group id="n21_ee78" name="n21" xy="113,268" size="165,80" group="n24_ee78"/>
+    <text id="n22_ee78" name="InputPwd" xy="286,283" size="525,49" group="n24_ee78" fontSize="36" color="#323232" vAlign="middle" autoSize="none" text="" input="true" prompt="[color=#C9CCD0]请输入密钥[/color]" password="true"/>
+    <component id="n23_ee78" name="PwdClear" src="c0x45" fileName="comps/BtnClear.xml" xy="825,283" group="n24_ee78"/>
+    <group id="n24_ee78" name="n24" xy="112,267" size="775,82"/>
+  </displayList>
+</component>

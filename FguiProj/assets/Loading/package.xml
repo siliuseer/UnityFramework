@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<packageDescription id="3u7drp4f">
+  <resources>
+    <component id="c0x40" name="Loading.xml" path="/" exported="true"/>
+    <component id="c0x41" name="Progress.xml" path="/comps/"/>
+    <image id="c0x42" name="loading_01.png" path="/imgs/" scale="9grid" scale9grid="21,11,292,22"/>
+    <image id="c0x43" name="loading_02.png" path="/imgs/" scale="9grid" scale9grid="10,4,287,8"/>
+    <image id="c0x44" name="bj.png" path="/imgs/"/>
+  </resources>
+  <publish name=""/>
+</packageDescription>

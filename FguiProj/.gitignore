@@ -1,0 +1,5 @@
+.objs
+.svn
+.DS_Store
+~*.xls*
+*.pyc

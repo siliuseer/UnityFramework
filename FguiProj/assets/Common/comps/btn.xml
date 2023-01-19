@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="156,60" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n2_s4i2" name="n2" src="c0x43" fileName="imgs/anniu.png" xy="0,0"/>
+    <text id="n1_p7xq" name="title" xy="61,8" size="34,42" fontSize="30" color="#544e35" align="center" vAlign="middle" singleLine="true" text="是">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </text>
+  </displayList>
+  <Button/>
+</component>

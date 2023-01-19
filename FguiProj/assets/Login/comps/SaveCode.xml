@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="300,47" extention="Button">
+  <controller name="button" pages="0,up,1,down,2,over,3,selectedOver" selected="0"/>
+  <displayList>
+    <image id="n3_ipus" name="n3" src="c0x42" fileName="imgs/Ellipse 1.png" xy="58,4" size="38,38" aspect="true"/>
+    <image id="n1_ipus" name="n1" src="c0x43" fileName="imgs/Vector.png" xy="58,4" size="38,38" aspect="true">
+      <gearDisplay controller="button" pages="1,3"/>
+    </image>
+    <text id="n2_ipus" name="title" xy="116,2" size="124,42" fontSize="30" color="#61666d" align="center" vAlign="middle" leading="1" singleLine="true" text="记住密码"/>
+  </displayList>
+  <Button mode="Check"/>
+  <relation target="n2_ipus" sidePair=""/>
+</component>

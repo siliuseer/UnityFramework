@@ -1,0 +1,47 @@
+{
+  "font": "ui://wn8vao6vmfzz1c",
+  "fontSize": 30,
+  "textColor": "#6d5339",
+  "fontAdjustment": false,
+  "colorScheme": [
+    "01 #6B3420",
+    "02 #5A4E32",
+    "03 #6A4923",
+    "04 #535352",
+    "05 #565D4E",
+    "06 #C10101",
+    "07 #168201",
+    "08 #000000",
+    "09 #C2A685",
+    "10 #895E2D",
+    "11 #3D514B",
+    "12 #E37355",
+    "13 #434343",
+    "14 #7D6342",
+    "15 #FFFFFF"
+  ],
+  "fontSizeScheme": [
+    "1 22",
+    "2 24",
+    "3 26",
+    "4 28",
+    "5 30",
+    "6 32",
+    "7 34",
+    "8 36",
+    "9 38",
+    "10 40"
+  ],
+  "fontScheme": [
+    "默认字体"
+  ],
+  "scrollBars": {
+    "horizontal": "",
+    "vertical": "",
+    "defaultDisplay": "visible"
+  },
+  "tipsRes": "",
+  "buttonClickSound": "",
+  "pivot": "default",
+  "fileName": "Common"
+}

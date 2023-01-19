@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="335,45" extention="ProgressBar">
+  <displayList>
+    <image id="n0_srtt" name="n0" src="c0x42" fileName="imgs/loading_01.png" xy="0,0" size="335,45">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+    <image id="n1_srtt" name="bar" src="c0x43" fileName="imgs/loading_02.png" xy="14,14" fillMethod="hz">
+      <relation target="" sidePair="width-width,height-height"/>
+    </image>
+  </displayList>
+  <ProgressBar/>
+</component>

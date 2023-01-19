@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<component size="298,80">
+  <displayList>
+    <graph id="n0_ipus" name="n0" xy="0,0" size="298,80" type="rect" lineSize="0" fillColor="#ffff6699" corner="8">
+      <relation target="" sidePair="width-width,height-height"/>
+    </graph>
+    <text id="n1_ipus" name="n1" xy="77,16" size="144,48" fontSize="35" color="#ffffff" text="开始游戏">
+      <relation target="" sidePair="center-center,middle-middle"/>
+    </text>
+  </displayList>
+</component>
