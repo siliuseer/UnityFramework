@@ -12,13 +12,7 @@ namespace siliu.editor
 {
     public static class I18NExport
     {
-        [MenuItem("Tools/语言包/开发", priority = 2000)]
-        private static void Menu()
-        {
-            Export(ExcelType.dev);
-        }
-
-        private static void Export(ExcelType excel)
+        public static void Export(string i18nDir)
         {
             try
             {
@@ -27,7 +21,7 @@ namespace siliu.editor
                 var assetDir = Application.dataPath+"/Asset/i18n";
                 Directory.CreateDirectory(assetDir);
                 var map = new Dictionary<string, I18NTb>();
-                var files = Directory.GetFiles($"{ExcelExport.ExtDir}/{excel}/i18n", "*.xlsx");
+                var files = Directory.GetFiles(i18nDir, "*.xlsx");
                 var idLines = new List<string>();
                 for (var i = 0; i < files.Length; i++)
                 {
@@ -142,9 +136,10 @@ namespace siliu.editor
                 AssetDatabase.Refresh();
                 EditorUtility.ClearProgressBar();
             }
+            Debug.Log($"语言包导出结束: {i18nDir}");
         }
 
-        public static DataTable LoadExcel(string path)
+        private static DataTable LoadExcel(string path)
         {
             using var stream = File.Open(path, FileMode.Open, FileAccess.Read);
             using var reader = ExcelReaderFactory.CreateReader(stream);

@@ -38,8 +38,7 @@ namespace siliu.tb
         }
 
         public List<TRow> Rows = new List<TRow>();
-
-
+        
         public TRow Find(int id)
         {
             foreach (var row in Rows)

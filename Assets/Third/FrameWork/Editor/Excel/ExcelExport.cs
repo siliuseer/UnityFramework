@@ -14,23 +14,12 @@ namespace siliu.editor
     public static class ExcelExport
     {
         private static readonly char[] Separators = { '|', ',', ';', '&', '#', '$' };
-        public static string ExtDir => Path.GetDirectoryName(Application.dataPath) + "/ext/";
 
-        [MenuItem("Tools/导表/开发", priority = 2000)]
-        private static void Menu()
-        {
-            // if (!SvnTool.UpdateOrCheckout($"{ExtDir}/{ExcelType.dev}", "Doc/%E6%95%B0%E6%8D%AE%E8%A1%A8/%E5%BC%80%E5%8F%91"))
-            // {
-            //     return;
-            // }
-            Export(ExcelType.dev);
-        }
-
-        public static void Export(ExcelType excel)
+        public static void Export(string excelDir)
         {
             try
             {
-                var files = Directory.GetFiles($"{ExtDir}/{excel}/excel", "*.xlsx");
+                var files = Directory.GetFiles(excelDir, "*.xlsx");
                 for (var i = 0; i < files.Length; i++)
                 {
                     var filePath = files[i];
@@ -51,6 +40,7 @@ namespace siliu.editor
                 AssetDatabase.Refresh();
                 EditorUtility.ClearProgressBar();
             }
+            Debug.Log($"数据表导出结束: {excelDir}");
         }
 
         private static void SaveTb(Type type, IReadOnlyList<Dictionary<string, string>> tb)

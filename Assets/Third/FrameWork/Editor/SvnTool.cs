@@ -27,7 +27,7 @@ public class SvnTool
     /// </summary>
     /// <param name="path"></param>
     /// <returns></returns>
-    private static bool Update(string path)
+    public static bool Update(string path)
     {
         if (!Directory.Exists(path))
         {
@@ -90,23 +90,5 @@ public class SvnTool
 
         return true;
 #endif
-    }
-
-    [MenuItem("Tools/更新客户端", priority = 2000)]
-    static void updateClient()
-    {
-        Update(Path.GetDirectoryName(Application.dataPath));
-    }
-    
-    // [MenuItem("Tools/打开临时目录", false, 2000)]
-    // private static void OpenLinShiPath()
-    // {
-    //     System.Diagnostics.Process.Start(Application.persistentDataPath);
-    // }
-
-    [MenuItem("Tools/打开客户端目录", false, 2000)]
-    private static void OpenClientPath()
-    {
-        System.Diagnostics.Process.Start(Path.GetDirectoryName(Application.dataPath));
     }
 }
