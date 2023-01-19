@@ -16,7 +16,8 @@ public class Game : MonoBehaviour
         playMode = string.IsNullOrEmpty(AppCfg.cdn) ? PlayMode.Offline : PlayMode.Host;
 #endif
         await ResUpdate.Init(playMode, cdn);
-        UIMgr.Init();
+        AssetLoader.Init("Assets/Asset");
+        UIMgr.Init("Assets/Asset/fgui", 1920, 1080);
         UIMgr.Show<LoginView>();
     }
 }

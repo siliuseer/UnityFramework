@@ -1,18 +1,26 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using YooAsset;
 
 namespace siliu
 {
     public class AssetLoader
     {
+        public static string root { get; private set; }
+
+        public static void Init(string dir)
+        {
+            root = dir;
+        }
         // 资源句柄列表
         private List<AssetOperationHandle> _handles = new List<AssetOperationHandle>(100);
         
         private T Load<T>(string address) where T : Object
         {
-            var handle = YooAssets.LoadAssetSync<T>(address);
+            var handle = YooAssets.LoadAssetSync<T>($"{root}/{address}");
             _handles.Add(handle);
             return handle.GetAssetObject<T>();
         }
@@ -25,6 +33,13 @@ namespace siliu
             await handle.Task;
             
             return handle.GetAssetObject<T>();
+        }
+
+        public static async Task<Scene> LoadSceneAsync(string address)
+        {
+            var handle = YooAssets.LoadSceneAsync($"{root}/scene/{address}");
+            await handle.Task;
+            return handle.SceneObject;
         }
 
         public Sprite LoadSprite(string address)

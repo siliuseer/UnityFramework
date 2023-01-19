@@ -28,18 +28,22 @@ public class LoginView : BaseDialog<fui.Login.Login>
 
     private void LinkStart()
     {
-        var pwd = view.m_InputPwd.text;
-        var code = view.m_InputCode.text.Replace("\r", string.Empty).Replace("\n", string.Empty).Replace(" ", string.Empty);
-        if (string.IsNullOrEmpty(code))
+        // var pwd = view.m_InputPwd.text;
+        // var code = view.m_InputCode.text.Replace("\r", string.Empty).Replace("\n", string.Empty).Replace(" ", string.Empty);
+        // if (string.IsNullOrEmpty(code))
+        // {
+        //     return;
+        // }
+        //
+        // if (view.m_BtnSave.selected)
+        // {
+        //     PlayerPrefsUtil.SetString(IdCodeKey, code);
+        //     PlayerPrefsUtil.SetString(PwdKey, pwd);
+        // }
+        LoadingView.LoadScene("game", () =>
         {
-            return;
-        }
-
-        if (view.m_BtnSave.selected)
-        {
-            PlayerPrefsUtil.SetString(IdCodeKey, code);
-            PlayerPrefsUtil.SetString(PwdKey, pwd);
-        }
-        UIMgr.Close<LoginView>();
+            UIMgr.Close<LoginView>();
+            AlertMsg.Alert("测试文本");
+        });
     }
 }

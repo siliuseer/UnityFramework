@@ -21,10 +21,12 @@ namespace siliu
             var split = _resUid.Split('.');
             _pkgName = split[^2];
             _resName = split[^1];
+            _assetLoader = new AssetLoader();
         }
         protected T view { get; private set; }
         public override string uid => GetType().FullName;
         public override string resUid => _resUid;
+        protected AssetLoader _assetLoader;
 
         public override void Create()
         {
@@ -62,6 +64,7 @@ namespace siliu
         public override void Close()
         {
             OnClose();
+            _assetLoader.Release();
             view.Dispose();
         }
         public override void Refresh()

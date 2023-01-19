@@ -77,12 +77,11 @@ namespace siliu
         {
             method = DestroyMethod.None; //注意：这里一定要设置为None
             var location = $"{pre}/{name}{extension}";
-            var assetPackage = YooAssets.GetAssetsPackage("DefaultPackage");
-            if (!assetPackage.CheckLocationValid(location))
+            if (!YooAssets.CheckLocationValid(location))
             {
                 return null;
             }
-            var handle = assetPackage.LoadAssetSync(location, type);
+            var handle = YooAssets.LoadAssetSync(location, type);
             _handles.Add(handle);
             return handle.AssetObject;
         }
