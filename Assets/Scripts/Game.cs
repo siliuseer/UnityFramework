@@ -1,4 +1,5 @@
 using siliu;
+using siliu.i18n;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -17,6 +18,7 @@ public class Game : MonoBehaviour
 #endif
         await ResUpdate.Init(playMode, cdn);
         AssetLoader.Init("Assets/Asset");
+        I18N.Init("Assets/Asset/i18n");
         UIMgr.Init("Assets/Asset/fgui", 1920, 1080);
         UIMgr.Show<LoginView>();
     }
