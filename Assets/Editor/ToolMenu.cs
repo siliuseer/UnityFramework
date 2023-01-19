@@ -33,7 +33,7 @@ public static class ToolMenu
         // {
         //     return;
         // }
-        ExcelExport.Export($"{ExtDir}/{excel}/i18n");
+        I18NExport.Export($"{ExtDir}/{excel}/i18n");
     }
 
     [MenuItem("Tools/更新客户端", priority = 2000)]
