@@ -10,6 +10,7 @@ namespace fui
         public static readonly Dictionary<string, Type> Binders = new Dictionary<string, Type>
         {
             {Common.AlertMsg.URL, typeof(Common.AlertMsg)},
+            {Common.ToastMsg.URL, typeof(Common.ToastMsg)},
             {Loading.Loading.URL, typeof(Loading.Loading)},
             {Login.Login.URL, typeof(Login.Login)},
         }
@@ -17,6 +18,7 @@ namespace fui
         public static readonly Dictionary<string, string[]> Depends = new Dictionary<string, string[]>
         {
             {"fui.Common.AlertMsg", new []{"Common"}},
+            {"fui.Common.ToastMsg", new []{"Common"}},
             {"fui.Loading.Loading", new []{"Loading"}},
             {"fui.Login.Login", new []{"Login"}},
         }

@@ -11,33 +11,21 @@ using UnityEngine;
 
 public class DouYin : MonoBehaviour
 {
-    public string roomId;
+    public static DouYin LinkStart(string roomId)
+    {
+        var go = new GameObject("[DouYin]");
+        DontDestroyOnLoad(go);
+        var douYin = go.AddComponent<DouYin>();
+        douYin._roomId = roomId;
+        return douYin;
+    }
+
+    private string _roomId;
     private IBrowser _browser;
     private IPage _page;
     public int Status { get; private set; }
 
-    private class ByteEntry
-    {
-        public string name;
-        public byte[] bytes;
-    }
-
-    private string byteDir;
-
-    private void Awake()
-    {
-        var dir = Application.dataPath + $"/../bytes/{roomId}";
-        if (!Directory.Exists(dir))
-        {
-            Directory.CreateDirectory(dir);
-        }
-
-        byteDir = dir;
-        LogUtil.Init(roomId);
-        StartPuppeteer();
-    }
-
-    private async void StartPuppeteer()
+    private async void Start()
     {
         try
         {
@@ -53,16 +41,16 @@ public class DouYin : MonoBehaviour
             {
                 Headless = false
             });
-
-            var url = $"https://live.douyin.com/{roomId}";
             _page = await _browser.NewPageAsync();
+            //await _page.SetUserAgentAsync("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36");
+            var url = $"https://live.douyin.com/{_roomId}";
             await _page.DeleteCookieAsync();
             await _page.GoToAsync(url);
             var session = await _page.Target.CreateCDPSessionAsync();
             await session.SendAsync("Network.enable");
             session.MessageReceived += this.OnMessageReceived;
             Status = 1;
-            LogUtil.Log(url);
+            Debug.Log(url);
         }
         catch (Exception e)
         {
@@ -83,8 +71,7 @@ public class DouYin : MonoBehaviour
             _queue.Clear();
         }
 
-        LogUtil.Log("[DouYin] Destroy!");
-        LogUtil.Dispose();
+        Debug.Log("[DouYin] Destroy!");
     }
 
     private void OnMessageReceived(object sender, MessageEventArgs data)
@@ -105,12 +92,6 @@ public class DouYin : MonoBehaviour
             return;
         }
 
-        if (payloadData == "hi")
-        {
-            LogUtil.Warning(payloadData);
-            return;
-        }
-
         try
         {
             var bytes = Convert.FromBase64String(payloadData);
@@ -128,7 +109,6 @@ public class DouYin : MonoBehaviour
         }
         catch (Exception e)
         {
-            LogUtil.Warning(payloadData);
             Debug.LogWarning(e);
         }
     }
@@ -137,34 +117,26 @@ public class DouYin : MonoBehaviour
     {
         try
         {
-            var bytes = msg.Payload.ToByteArray();
-            LogUtil.Log($"[{msg.Method}]: {bytes.Length}");
-            if (!count.TryGetValue(msg.Method, out var num))
-            {
-                num = 0;
-            }
-            else
-            {
-                num++;
-            }
-
-            count[msg.Method] = num;
-            Directory.CreateDirectory($"{byteDir}/{msg.Method}");
-            File.WriteAllBytes($"{byteDir}/{msg.Method}/{num}_{DateTime.Now:yyyyMMdd_HHmmss}.bin", bytes);
-
             switch (msg.Method)
             {
                 case "WebcastChatMessage":
                 {
                     var message = ChatMessage.Parser.ParseFrom(msg.Payload);
                     var user = message.User;
-                    Debug.Log($"[DanMu]: {user.Nickname}[{user.ShortId}]: {message.Content}");
+                    string userIconUrl="";
+                    if (user.AvatarThumb.UrlList.Count > 0)
+                    {
+                        userIconUrl = user.AvatarThumb.UrlList[0];
+                    }
+
+                    // Debug.Log($"[DanMu]: {user.Nickname}[{user.ShortId}]: {message.Content}");
                     Enqueue(new DouYinJson
                     {
                         type = 1,
                         uid = user.ShortId.ToString(),
                         name = user.Nickname,
-                        msg = message.Content
+                        msg = message.Content,
+                        icon=userIconUrl
                     });
                     break;
                 }
@@ -193,10 +165,9 @@ public class DouYin : MonoBehaviour
                                 break;
                         }
                     }
-
+                    // Debug.Log($"[Gift]: {user.Nickname}[{user.ShortId}]: {giftName} x {message.GroupCount}, RepeatCount: {message.RepeatCount}, RepeatEnd: {message.RepeatEnd}, ComboCount: {message.ComboCount}");
                     if ((gift != null && gift.Type != 1) || message.RepeatEnd == 1)
                     {
-                        LogUtil.Log($"[Gift]: {user.Nickname}[{user.ShortId}]: GiftId: {message.GiftId}, Name: {giftName}, RepeatEnd: {message.RepeatEnd}, GroupCount: {message.GroupCount}, RepeatCount: {message.RepeatCount}, ComboCount: {message.ComboCount}");
                         Enqueue(new DouYinJson
                         {
                             type = 2,
@@ -206,77 +177,62 @@ public class DouYin : MonoBehaviour
                             num = message.RepeatCount.ToString()
                         });
                     }
-
                     break;
                 }
                 case "WebcastMemberMessage":
                 {
-                    var message = MemberMessage.Parser.ParseFrom(msg.Payload);
-                    // LogUtil.Log($"[进入] {message.User.Nickname} 进入直播间");
+                    // var message = MemberMessage.Parser.ParseFrom(msg.Payload);
                     break;
                 }
                 case "WebcastSocialMessage":
                 {
-                    var message = SocialMessage.Parser.ParseFrom(msg.Payload);
-                    // LogUtil.Log($"[关注] {message.User.Nickname} 关注了主播");
+                    // var message = SocialMessage.Parser.ParseFrom(msg.Payload);
                     break;
                 }
                 case "WebcastLikeMessage":
                 {
-                    var message = LikeMessage.Parser.ParseFrom(msg.Payload);
-                    // LogUtil.Log($"[点赞] {message.User.Nickname} 点赞了直播间({message.Count})");
+                    // var message = LikeMessage.Parser.ParseFrom(msg.Payload);
                     break;
                 }
                 case "WebcastRoomUserSeqMessage":
                 {
-                    var message = RoomUserSeqMessage.Parser.ParseFrom(msg.Payload);
-                    // LogUtil.Log($"[观看人数]: {message.Total}/ {message.TotalUser}");
+                    // var message = RoomUserSeqMessage.Parser.ParseFrom(msg.Payload);
                     break;
                 }
                 case "WebcastControlMessage":
                 {
-                    var message = ControlMessage.Parser.ParseFrom(msg.Payload);
-                    // LogUtil.Log($"[Control] {message.Common.User.Nickname}");
+                    // var message = ControlMessage.Parser.ParseFrom(msg.Payload);
                     break;
                 }
                 case "WebcastFansclubMessage":
                 {
-                    var message = FansclubMessage.Parser.ParseFrom(msg.Payload);
-                    // LogUtil.Log($"[Fansclub] {message.Content}");
+                    // var message = FansclubMessage.Parser.ParseFrom(msg.Payload);
                     break;
                 }
-                case "WebcastRoomMessage": //房间信息
-                case "WebcastBindingGiftMessage": //礼物达到数量特殊效果
-                case "WebcastRoomStatsMessage":
-                case "WebcastRoomRankMessage":
-                case "WebcastInRoomBannerMessage":
-                case "WebcastScreenChatMessage":
-                    break;
-                // case "WebcastRoomNotifyMessage":
-                // case "WebcastPrivilegeScreenChatMessage":
-                // case "WebcastEmojiChatMessage":
-                // case "WebcastLuckyBoxMessage":
-                // case "WebcastLuckyBoxEndMessage":
-                // case "WebcastLinkMicArmiesMethod":
-                // case "WebcastLinkMicMethod":
-                // case "WebcastLinkMessage":
-                // case "WebcastProfitInteractionScoreMessage":
-                // case "WebcastLinkMicBattleMethod":
-                // case "WebcastLotteryEventMessage":
-                // case "WebcastLotteryEventNewMessage":
-                // case "WebcastCommonTextMessage":
-                // case "WebcastRoomDataSyncMessage":
-                // case "WebcastPullStreamUpdateMessage":
-                // case "WebcastGameCPUserDownloadMessage":
-                // case "WebcastBattleTeamTaskMessage":
-                // case "WebcastUpdateFanTicketMessage":
-                // case "LinkMicMethod":
-                // case "LinkMicBattleMethod":
-                // case "WebcastLinkMicGuideMessage":
-                // case "WebcastLinkerContributeMessage":
-                //     break;
+                case "WebcastLinkMicGuideMessage": break;
+                case "WebcastLinkerContributeMessage": break;
+                case "WebcastLuckyBoxEndMessage": break;
+                case "WebcastRoomMessage": break;
+                case "WebcastRoomNotifyMessage": break;
+                case "WebcastPrivilegeScreenChatMessage": break;
+                case "WebcastEmojiChatMessage": break;
+                case "WebcastScreenChatMessage": break;
+                case "WebcastBattleTeamTaskMessage": break;
+                case "WebcastUpdateFanTicketMessage": break;
+                case "WebcastLinkMicArmiesMethod": break;
+                case "WebcastLuckyBoxMessage": break;
+                case "WebcastBindingGiftMessage": break;
+                case "WebcastLinkMicMethod": break;
+                case "WebcastLinkMessage": break;
+                case "WebcastProfitInteractionScoreMessage": break;
+                case "LinkMicMethod": break;
+                case "WebcastLinkMicBattleMethod": break;
+                case "LinkMicBattleMethod": break;
+                case "WebcastLotteryEventMessage": break;
+                case "WebcastLotteryEventNewMessage": break;
                 default:
                 {
+                    Debug.Log($"未知消息: {msg.Method}");
                     break;
                 }
             }
@@ -287,13 +243,31 @@ public class DouYin : MonoBehaviour
         }
     }
 
-    private Dictionary<string, int> count = new Dictionary<string, int>();
-
     private void Enqueue(DouYinJson data)
     {
         lock (_queue)
         {
             _queue.Enqueue(data);
+        }
+    }
+
+    private void Update()
+    {
+        lock (_queue)
+        {
+            while (_queue.Count > 0)
+            {
+                var data = _queue.Dequeue();
+                // switch (data.type)
+                // {
+                //     case 1: //弹幕
+                //         CmdMgr.DealDm(data.uid, data.name, data.msg, data.icon);
+                //         break;
+                //     case 2: //礼物
+                //         CmdMgr.DealGift(data.uid, data.name, data.msg, data.num);
+                //         break;
+                // }
+            }
         }
     }
 
@@ -306,5 +280,6 @@ public class DouYin : MonoBehaviour
         public string name;
         public string msg;
         public string num;
+        public string icon;
     }
 }

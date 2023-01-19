@@ -1,7 +1,6 @@
 using siliu;
 using Sirenix.OdinInspector;
 using UnityEngine;
-using UnityEngine.Rendering.Universal;
 
 public class Game : MonoBehaviour
 {
@@ -19,14 +18,5 @@ public class Game : MonoBehaviour
         await ResUpdate.Init(playMode, cdn);
         UIMgr.Init();
         UIMgr.Show<LoginView>();
-        // var renderCamera = FairyGUI.Stage.inst.renderCamera;
-        // renderCamera.GetUniversalAdditionalCameraData().renderType = CameraRenderType.Overlay;
-        // var main = Camera.main;
-        // if (main != null)
-        // {
-        //     var stack = main.GetUniversalAdditionalCameraData().cameraStack;
-        //     stack.Clear();
-        //     stack.Add(renderCamera);
-        // }
     }
 }
