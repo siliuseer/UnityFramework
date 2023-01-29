@@ -1,5 +1,4 @@
 using siliu;
-using siliu.i18n;
 using Sirenix.OdinInspector;
 using UnityEngine;
 
@@ -16,10 +15,7 @@ public class Game : MonoBehaviour
 #if !UNITY_EDITOR
         playMode = string.IsNullOrEmpty(AppCfg.cdn) ? PlayMode.Offline : PlayMode.Host;
 #endif
-        await ResUpdate.Init(playMode, cdn);
-        AssetLoader.Init("Assets/Asset");
-        I18N.Init("Assets/Asset/i18n");
-        UIMgr.Init("Assets/Asset/fgui", 1920, 1080);
+        await GameMgr.InitAsync(playMode, cdn);
         UIMgr.Show<LoginView>();
     }
 }

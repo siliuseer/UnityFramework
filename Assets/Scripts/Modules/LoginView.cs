@@ -1,5 +1,6 @@
 ﻿using FairyGUI;
 using siliu;
+using UnityEngine;
 
 public class LoginView : BaseDialog<fui.Login.Login>
 {
@@ -24,6 +25,10 @@ public class LoginView : BaseDialog<fui.Login.Login>
         view.m_BtnClear.BindClick(() => { view.m_InputCode.text = string.Empty; });
         view.m_PwdClear.BindClick(() => { view.m_InputPwd.text = string.Empty; });
         view.m_BtnLogin.BindClick(LinkStart);
+    }
+    private struct S
+    {
+        public int id;
     }
 
     private void LinkStart()

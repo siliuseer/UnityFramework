@@ -11,12 +11,11 @@ namespace siliu
         private static readonly List<IView> Loadings = new List<IView>();
         private static readonly Dictionary<string, PkgLoader> LoadedPkgs = new Dictionary<string, PkgLoader>();
 
-        public static void Init(string fguiDir, int designX = 1920, int designY = 1080)
+        public static void Init(int designX = 1920, int designY = 1080)
         {
             // UIConfig.defaultFont = "GameFont";
-            PkgLoader.Init(fguiDir);
             UIObjectFactory.SetLoaderExtension(typeof(IconLoader));
-            GRoot.inst.SetContentScaleFactor(designX, designY, UIContentScaler.ScreenMatchMode.MatchWidthOrHeight);
+            GRoot.inst.SetContentScaleFactor(designX, designY);
             foreach (var pair in FuiCfg.Binders)
             {
                 UIObjectFactory.SetPackageItemExtension(pair.Key, pair.Value);

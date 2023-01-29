@@ -16,12 +16,6 @@ namespace siliu
 
         private int count;
         private string pkg;
-        private static string pre;
-
-        public static void Init(string path)
-        {
-            pre = path;
-        }
 
         public PkgLoader(string pkg)
         {
@@ -76,7 +70,7 @@ namespace siliu
         private object LoadFunc(string name, string extension, System.Type type, out DestroyMethod method)
         {
             method = DestroyMethod.None; //注意：这里一定要设置为None
-            var location = $"{pre}/{name}{extension}";
+            var location = $"{AssetLoader.root}/fgui/{name}{extension}";
             if (!YooAssets.CheckLocationValid(location))
             {
                 return null;

@@ -27,7 +27,7 @@ namespace siliu
         
         private async Task<T> LoadAsync<T>(string address) where T : Object
         {
-            var handle = YooAssets.LoadAssetAsync<T>(address);
+            var handle = YooAssets.LoadAssetAsync<T>($"{root}/{address}");
             _handles.Add(handle);
             
             await handle.Task;
