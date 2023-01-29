@@ -436,6 +436,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cdn: 
   playMode: 0
+  w: 0
+  h: 0
 --- !u!4 &1767237375
 Transform:
   m_ObjectHideFlags: 0

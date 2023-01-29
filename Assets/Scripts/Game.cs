@@ -6,6 +6,13 @@ public class Game : MonoBehaviour
 {
     [LabelText("资源服地址")] public string cdn;
     [LabelText("运行模式")] public PlayMode playMode;
+    [LabelWidth(30)]
+    [LabelText("宽")]
+    [HorizontalGroup("size")]
+    public int w;
+    [HorizontalGroup("size")]
+    [LabelWidth(30)]
+    [LabelText("高")] public int h;
 
     private async void Start()
     {

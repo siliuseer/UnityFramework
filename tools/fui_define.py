@@ -129,7 +129,7 @@ class Resource():
         self.res_id = el.get("id")
         self.id = "%s%s" % (pkg.id, self.res_id)
         self.path = ("%s%s"%(el.get("path"), el.get("name"))).strip("/")
-        self.className = "%s%s" % (classNamePrefix, pkg.pinyin.convert(os.path.splitext(os.path.basename(self.path))[0]))
+        self.className = pkg.pinyin.convert(os.path.splitext(os.path.basename(self.path))[0])#"%s%s" % (classNamePrefix, pkg.pinyin.convert(os.path.splitext(os.path.basename(self.path))[0]))
 
     def isComponent(self):
         return self.tag == "component"
@@ -210,12 +210,13 @@ class Resource():
         if depends is None:
             return
 
-        cpath = os.path.join(code_path, self.pkg.pkg_name, "%s.ts" % (self.className))
+        cpath = os.path.join(code_path, "FuiCfg.cs")
         if not os.path.exists(cpath):
             return
 
         depends.sort()
-        replace_line(cpath, "\"%s\""%"\",\"".join(depends), "public static Depend: string[] = [", "];")
+
+        replace_line(cpath, "\"%s\""%"\",\"".join(depends), '{"fui.%s.%s", new []{' % (self.pkg.pkg_name, self.className), '}},')
 
 class Package():
     def __init__(self, root, pkg_dir, ui_proj_root, res_out, bin_path, pinyin):
@@ -326,46 +327,12 @@ def fix_fgui(UI_PROJ, BIN_PATH):
         for comp in pkg.components:
             comp.modifyDepends(ui_code_path, pkg_map, res_map)
 
-    ui_binders = []
-    for d in os.listdir(ui_code_path):
-        p = os.path.join(ui_code_path, d)
-        if not os.path.isdir(p):
-            continue
-
-        for dir in os.listdir(p):
-            if not dir.startswith(classNamePrefix):
-                continue
-            ui_binders.append("%s/%s" % (d, dir))
-
-    class_lines = [
-        'import { FairyGUI } from "csharp";'
-        "export class FguiBinder {",
-        "\tpublic static readonly pkgFileExtension:string = \"%s\";" % fileExtension.strip(),
-        "\tpublic static readonly binders:{[key: string]: typeof FairyGUI.GComponent} = {",
-        "\t};",
-        "\tpublic static readonly urls:{[key: string]: string} = {",
-    ]
-    out_binder = os.path.abspath(os.path.join(ui_code_path, "FguiBinder.ts"))
-    import_index = 0
-    binder_index = len(class_lines)-1
-    ui_binders.sort()
-    for binder in ui_binders:
-        module = os.path.basename(binder)[:-3]
-        class_lines.insert(import_index, 'import { %s } from "./%s";'%(module, binder[:-3]))
-        import_index += 1
-        class_lines.insert(binder_index, "\t\t[%s.URL]: %s," % (module, module))
-        binder_index += 1
-        class_lines.append('\t\t["%s"]: %s.URL,' % (module[3:], module))
-    class_lines.append("\t}")
-    class_lines.append("}")
-    write_file(out_binder, class_lines, "\n")
-
 def build():
-    CUR_PATH = os.path.dirname(__file__)
-    PROJ_PATH = os.path.abspath(os.path.join(CUR_PATH, ".."))
-    BIN_PATH = os.path.join(PROJ_PATH, "U3dProj/Assets/Asset")
+    cur_path = os.path.dirname(__file__)
+    proj_path = os.path.abspath(os.path.join(cur_path, ".."))
+    bin_path = os.path.join(proj_path, "Assets/Asset/fgui")
 
-    fix_fgui(os.path.abspath(os.path.join(PROJ_PATH, "../FguiProj")), BIN_PATH)
+    fix_fgui(os.path.abspath(os.path.join(proj_path, "FguiProj")), bin_path)
 
 # -------------- main --------------
 if __name__ == '__main__':
