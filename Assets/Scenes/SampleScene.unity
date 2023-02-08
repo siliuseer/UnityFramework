@@ -435,9 +435,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   cdn: 
+  assetRoot: 
   playMode: 0
-  w: 0
-  h: 0
+  w: 1920
+  h: 1080
 --- !u!4 &1767237375
 Transform:
   m_ObjectHideFlags: 0

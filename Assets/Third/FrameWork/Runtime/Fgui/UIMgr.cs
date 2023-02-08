@@ -11,7 +11,7 @@ namespace siliu
         private static readonly List<IView> Loadings = new List<IView>();
         private static readonly Dictionary<string, PkgLoader> LoadedPkgs = new Dictionary<string, PkgLoader>();
 
-        public static void Init(int designX = 1920, int designY = 1080)
+        public static void Init(int designX, int designY)
         {
             // UIConfig.defaultFont = "GameFont";
             UIObjectFactory.SetLoaderExtension(typeof(IconLoader));
