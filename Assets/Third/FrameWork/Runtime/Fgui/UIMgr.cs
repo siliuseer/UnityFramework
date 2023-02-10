@@ -8,8 +8,16 @@ namespace siliu
     public class UIMgr
     {
         private static readonly List<IView> Stack = new List<IView>();
-        private static readonly List<IView> Loadings = new List<IView>();
+        private static readonly List<ViewLoadData> Loadings = new List<ViewLoadData>();
         private static readonly Dictionary<string, PkgLoader> LoadedPkgs = new Dictionary<string, PkgLoader>();
+
+        private class ViewLoadData
+        {
+            public IView view;
+            public bool loaded;
+            public GObject popup;
+            public object[] args;
+        }
 
         public static void Init(int designX, int designY)
         {
@@ -33,30 +41,33 @@ namespace siliu
             {
                 return;
             }
-            
+
             GRoot.inst.touchable = false;
 
-            var t = new T {
+            var data = new ViewLoadData
+            {
                 args = args,
                 popup = target,
-                loaded = false
+                loaded = false,
+                view = new T(),
             };
-            Loadings.Add(t);
-            LoadPkg(t);
+            Loadings.Add(data);
+            LoadPkg(data);
             for (var i = Loadings.Count - 1; i >= 0; i--)
             {
                 var v = Loadings[i];
-                if (v.uid == t.uid)
+                if (v.view.uid == data.view.uid)
                 {
                     v.loaded = true;
                 }
             }
+
             ShowNext();
         }
 
-        private static void LoadPkg(IView view)
+        private static void LoadPkg(ViewLoadData data)
         {
-            var pkg = view.resUid;
+            var pkg = data.view.resUid;
             var pkgs = new List<string>();
             if (FuiCfg.Depends.TryGetValue(pkg, out var depends))
             {
@@ -70,6 +81,7 @@ namespace siliu
                     loader = new PkgLoader(p);
                     LoadedPkgs.Add(p, loader);
                 }
+
                 loader.Load();
             }
         }
@@ -82,21 +94,24 @@ namespace siliu
                 return;
             }
 
-            var view = Loadings[0];
-            if (!view.loaded)
+            var data = Loadings[0];
+            if (!data.loaded)
             {
                 return;
             }
+
             Loadings.RemoveAt(0);
-            if (Refresh(view.uid, view.args))
+            var view = data.view;
+            if (Refresh(view.uid, data.args))
             {
                 return;
             }
-            view.Create();
+
+            view.Create(data.popup);
             Stack.Add(view);
-            view.Show();
-            
-            ShowNext(); 
+            view.Show(data.args);
+
+            ShowNext();
         }
 
         public static bool Refresh<T>(params object[] args) where T : IView
@@ -107,8 +122,7 @@ namespace siliu
                 return false;
             }
 
-            view.args = args;
-            view.Refresh();
+            view.Refresh(args);
             return true;
         }
 
@@ -120,8 +134,7 @@ namespace siliu
                 return false;
             }
 
-            view.args = args;
-            view.Refresh();
+            view.Refresh(args);
             return true;
         }
 
@@ -141,7 +154,7 @@ namespace siliu
         public static T Find<T>() where T : IView
         {
             var name = typeof(T).FullName;
-            return Find(name) as T;
+            return (T)Find(name);
         }
 
         public static void Close<T>() where T : IView
@@ -154,21 +167,21 @@ namespace siliu
             var ui = Find(uid);
             if (ui == null)
             {
-                for (var i = Loadings.Count-1; i >= 0; i--)
+                for (var i = Loadings.Count - 1; i >= 0; i--)
                 {
                     var e = Loadings[i];
-                    if (e.uid != uid) continue;
-                    
+                    if (e.view.uid != uid) continue;
+
                     Loadings.RemoveAt(i);
                     return;
                 }
             }
 
-            for (var i = Stack.Count-1; i >= 0; i--)
+            for (var i = Stack.Count - 1; i >= 0; i--)
             {
                 var e = Stack[i];
                 if (e.uid != uid) continue;
-                
+
                 ui = e;
                 Stack.RemoveAt(i);
                 break;
@@ -178,6 +191,7 @@ namespace siliu
             {
                 return;
             }
+
             ui.Close();
             if (FuiCfg.Depends.TryGetValue(ui.resUid, out var depends))
             {
@@ -189,29 +203,32 @@ namespace siliu
                     }
                 }
             }
+
             RemoveUnusedPkg();
         }
 
         public static void CloseAll(params string[] excepts)
         {
             var list = new List<string>();
-            for (int i = Loadings.Count-1; i >= 0; i--)
+            for (var i = Loadings.Count - 1; i >= 0; i--)
             {
                 var e = Loadings[i];
-                if (excepts != null && excepts.Contains(e.uid))
+                if (excepts != null && excepts.Contains(e.view.uid))
                 {
                     continue;
                 }
-                list.Add(e.uid);
+
+                list.Add(e.view.uid);
             }
 
-            for (int i = Stack.Count-1; i >= 0; i--)
+            for (var i = Stack.Count - 1; i >= 0; i--)
             {
                 var e = Stack[i];
                 if (excepts != null && excepts.Contains(e.uid))
                 {
                     continue;
                 }
+
                 list.Add(e.uid);
             }
 

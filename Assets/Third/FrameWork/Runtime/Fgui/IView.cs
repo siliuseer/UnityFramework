@@ -2,18 +2,14 @@
 
 namespace siliu
 {
-    public abstract class IView
+    public interface IView
     {
-        public object[] args;
-        public bool loaded;
-        public GObject popup;
-        
-        public abstract string uid { get; }
-        public abstract string resUid { get; }
+        public string uid { get; }
+        public string resUid { get; }
 
-        public abstract void Create();
-        public abstract void Show();
-        public abstract void Refresh();
-        public abstract void Close();
+        public void Create(GObject popup);
+        public void Show(params object[] args);
+        public void Refresh(params object[] args);
+        public void Close();
     }
 }

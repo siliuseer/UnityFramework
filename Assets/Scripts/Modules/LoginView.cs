@@ -7,7 +7,7 @@ public class LoginView : BaseDialog<fui.Login.Login>
     private const string IdCodeKey = "RoomCode";
     private const string PwdKey = "RoomPwd";
 
-    protected override void OnShow()
+    protected override void OnShow(params object[] objects)
     {
         view.m_InputCode.text = PlayerPrefsUtil.GetString(IdCodeKey);
         view.m_InputPwd.text = PlayerPrefsUtil.GetString(PwdKey);
@@ -25,10 +25,6 @@ public class LoginView : BaseDialog<fui.Login.Login>
         view.m_PwdClear.BindClick(() => { view.m_InputPwd.text = string.Empty; });
         view.m_BtnLogin.BindClick(LinkStart);
     }
-    private struct S
-    {
-        public int id;
-    }
 
     private void LinkStart()
     {
@@ -45,5 +41,6 @@ public class LoginView : BaseDialog<fui.Login.Login>
             PlayerPrefsUtil.SetString(PwdKey, pwd);
         }
         CloseMySelf();
+        UIMgr.Show<LinkView>();
     }
 }

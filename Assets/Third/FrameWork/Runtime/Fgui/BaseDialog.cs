@@ -9,7 +9,7 @@ namespace siliu
     public abstract class BaseDialog<T> : BaseView<T> where T : GComponent
     {
         private Window _window;
-        protected override void AddToRoot()
+        protected override void AddToRoot(GObject popup)
         {
             var root = GRoot.inst;
             _window = new Window {contentPane = view, modal = true};

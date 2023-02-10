@@ -13,7 +13,7 @@ public class AlertMsg : BaseDialog<fui.Common.AlertMsg>
         public Action confirm;
         public Action cancel;
     }
-    protected override void OnShow()
+    protected override void OnShow(params object[] args)
     {
         var data = args[0] as AlertData;
         if (data == null)

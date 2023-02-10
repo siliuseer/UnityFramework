@@ -8,10 +8,10 @@ namespace siliu
     /// <typeparam name="T">fgui组件</typeparam>
     public abstract class BaseScene<T> : BaseView<T> where T : GComponent
     {
-        protected override void AddToRoot()
+        protected override void AddToRoot(GObject popup)
         {
             UIMgr.CloseAll();
-            base.AddToRoot();
+            base.AddToRoot(popup);
         }
     }
 }

@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using YooAsset;
+using Object = UnityEngine.Object;
 
 namespace siliu
 {
@@ -18,14 +20,26 @@ namespace siliu
         // 资源句柄列表
         private List<AssetOperationHandle> _handles = new List<AssetOperationHandle>(100);
         
-        private T Load<T>(string address) where T : Object
+        public T Load<T>(string address) where T : Object
         {
             var handle = YooAssets.LoadAssetSync<T>($"{root}/{address}");
             _handles.Add(handle);
             return handle.GetAssetObject<T>();
         }
+
+        public object LoadByType(string address, Type type)
+        {
+            var location = $"{root}/{address}";
+            if (!YooAssets.CheckLocationValid(location))
+            {
+                return null;
+            }
+            var handle = YooAssets.LoadAssetSync(location, type);
+            _handles.Add(handle);
+            return handle.AssetObject;
+        }
         
-        private async Task<T> LoadAsync<T>(string address) where T : Object
+        public async Task<T> LoadAsync<T>(string address) where T : Object
         {
             var handle = YooAssets.LoadAssetAsync<T>($"{root}/{address}");
             _handles.Add(handle);

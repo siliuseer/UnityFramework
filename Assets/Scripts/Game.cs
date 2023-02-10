@@ -22,12 +22,7 @@ public class Game : MonoBehaviour
         siliu.i18n.I18N.Init();
         UIMgr.Init(AppCfg.w, AppCfg.h);
         
-        InitEnd();
-    }
-
-    private void InitEnd()
-    {
-        UIMgr.Show<LoginView>();
+        UIMgr.Show<HotFixView>();
     }
 
     private void OnDestroy()

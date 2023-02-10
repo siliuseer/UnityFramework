@@ -3,7 +3,7 @@ using siliu;
 
 public class LoadingView : BaseTopView<fui.Loading.Loading>
 {
-    protected override void OnShow()
+    protected override void OnShow(params object[] objects)
     {
         view.m_bar.TweenValue(100, 30);
     }

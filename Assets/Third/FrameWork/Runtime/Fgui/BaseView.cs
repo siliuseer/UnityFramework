@@ -11,6 +11,7 @@ namespace siliu
         private readonly string _resUid;
         private readonly string _pkgName;
         private readonly string _resName;
+
         protected BaseView()
         {
             _resUid = typeof(T).FullName;
@@ -18,61 +19,61 @@ namespace siliu
             {
                 return;
             }
+
             var split = _resUid.Split('.');
             _pkgName = split[^2];
             _resName = split[^1];
             assetLoader = new AssetLoader();
             eventMesh = new EventMesh();
         }
+
         protected T view { get; private set; }
-        public override string uid => GetType().FullName;
-        public override string resUid => _resUid;
+        public string uid => GetType().FullName;
+        public string resUid => _resUid;
         protected readonly AssetLoader assetLoader;
         protected readonly EventMesh eventMesh;
 
-        public override void Create()
+        public void Create(GObject popup)
         {
             view = (T)UIPackage.CreateObject(_pkgName, _resName);
             view.fairyBatching = true;
-            AddToRoot();
+            AddToRoot(popup);
         }
 
         /// <summary>
         /// 添加到场景
         /// </summary>
-        protected virtual void AddToRoot()
+        protected virtual void AddToRoot(GObject popup)
         {
             var root = GRoot.inst;
             if (popup != null)
             {
-                view.displayObject.onRemovedFromStage.Add(() =>
-                {
-                    UIMgr.Close(uid);
-                });
+                view.displayObject.onRemovedFromStage.Add(() => { UIMgr.Close(uid); });
                 root.ShowPopup(view, popup);
                 return;
             }
-            
+
             view.SetSize(root.width, root.height);
             view.AddRelation(root, RelationType.Size);
             root.AddChild(view);
         }
 
-        public override void Show()
+        public void Show(params object[] args)
         {
-            OnShow();
+            OnShow(args);
         }
 
-        public override void Close()
+        public virtual void Close()
         {
             eventMesh.Dispose();
             OnClose();
             assetLoader.Release();
             view.Dispose();
         }
-        public override void Refresh()
+
+        public void Refresh(params object[] args)
         {
-            OnRefresh();
+            OnRefresh(args);
         }
 
         protected void CloseMySelf()
@@ -83,14 +84,22 @@ namespace siliu
         /// <summary>
         /// 添加到场景之后调用
         /// </summary>
-        protected virtual void OnShow() {}
+        protected virtual void OnShow(params object[] args)
+        {
+        }
+
         /// <summary>
         /// 刷新调用
         /// </summary>
-        protected virtual void OnRefresh() {}
+        protected virtual void OnRefresh(params object[] args)
+        {
+        }
+
         /// <summary>
         /// 关闭之前调用
         /// </summary>
-        protected virtual void OnClose() {}
+        protected virtual void OnClose()
+        {
+        }
     }
 }

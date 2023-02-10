@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using YooAsset;
 
 namespace siliu.tb
 {
@@ -12,6 +11,7 @@ namespace siliu.tb
     }
     public abstract class IBaseTb : ScriptableObject
     {
+        protected static AssetLoader Loader;
     }
 
     public class BaseTb<T, TRow> : IBaseTb where T : BaseTb<T, TRow> where TRow : IBaseRow
@@ -22,17 +22,9 @@ namespace siliu.tb
             get
             {
                 if (_inst != null) return _inst;
-
-                var h = YooAssets.LoadAssetSync<T>("tb/"+typeof(T).Name);
-                if (!h.IsDone || !h.IsValid)
-                {
-                    Debug.LogWarning("Not Found TbData: " + typeof(T).FullName);
-                }
-                else
-                {
-                    _inst = h.GetAssetObject<T>();
-                }
-
+                
+                Loader ??= new AssetLoader();
+                _inst = Loader.Load<T>("tb/"+typeof(T).Name);
                 return _inst;
             }
         }

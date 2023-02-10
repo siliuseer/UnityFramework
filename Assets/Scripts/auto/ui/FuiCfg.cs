@@ -12,6 +12,8 @@ namespace fui
             {Common.AlertMsg.URL, typeof(Common.AlertMsg)},
             {Common.ToastMsg.URL, typeof(Common.ToastMsg)},
             {Loading.Loading.URL, typeof(Loading.Loading)},
+            {Loading.Link.URL, typeof(Loading.Link)},
+            {Loading.HotFix.URL, typeof(Loading.HotFix)},
             {Login.Login.URL, typeof(Login.Login)},
         }
         ;
@@ -20,6 +22,8 @@ namespace fui
             {"fui.Common.AlertMsg", new []{"Common"}},
             {"fui.Common.ToastMsg", new []{"Common"}},
             {"fui.Loading.Loading", new []{"Loading"}},
+            {"fui.Loading.Link", new []{"Loading"}},
+            {"fui.Loading.HotFix", new []{"Loading"}},
             {"fui.Login.Login", new []{"Login"}},
         }
         ;
