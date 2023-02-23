@@ -7,7 +7,7 @@ public class LoginView : BaseDialog<fui.Login.Login>
     private const string IdCodeKey = "RoomCode";
     private const string PwdKey = "RoomPwd";
 
-    protected override void OnShow(params object[] objects)
+    protected override void OnShow(params object[] args)
     {
         view.m_InputCode.text = PlayerPrefsUtil.GetString(IdCodeKey);
         view.m_InputPwd.text = PlayerPrefsUtil.GetString(PwdKey);
@@ -41,6 +41,6 @@ public class LoginView : BaseDialog<fui.Login.Login>
             PlayerPrefsUtil.SetString(PwdKey, pwd);
         }
         CloseMySelf();
-        UIMgr.Show<LinkView>();
+        UIMgr.Show<LinkView>(code, pwd);
     }
 }

@@ -15,8 +15,7 @@ public class AlertMsg : BaseDialog<fui.Common.AlertMsg>
     }
     protected override void OnShow(params object[] args)
     {
-        var data = args[0] as AlertData;
-        if (data == null)
+        if (args[0] is not AlertData data)
         {
             UIMgr.Close<AlertMsg>();
             return;

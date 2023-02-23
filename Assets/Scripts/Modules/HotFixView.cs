@@ -2,7 +2,7 @@
 
 public class HotFixView : BaseScene<fui.Loading.Loading>
 {
-    protected override void OnShow(params object[] objects)
+    protected override void OnShow(params object[] args)
     {
         StartUpdate();
     }

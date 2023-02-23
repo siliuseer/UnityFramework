@@ -8,34 +8,38 @@ namespace siliu
     /// <typeparam name="T">fgui组件</typeparam>
     public abstract class BaseView<T> : IView where T : GComponent
     {
-        private readonly string _resUid;
-        private readonly string _pkgName;
-        private readonly string _resName;
-
         protected BaseView()
         {
-            _resUid = typeof(T).FullName;
-            if (string.IsNullOrEmpty(_resUid))
+            uid = GetType().FullName;
+            resUid = typeof(T).FullName;
+            if (string.IsNullOrEmpty(resUid))
             {
                 return;
             }
 
-            var split = _resUid.Split('.');
-            _pkgName = split[^2];
-            _resName = split[^1];
             assetLoader = new AssetLoader();
             eventMesh = new EventMesh();
         }
 
+        ~BaseView()
+        {
+            assetLoader.Release();
+            eventMesh.Dispose();
+        }
+
         protected T view { get; private set; }
-        public string uid => GetType().FullName;
-        public string resUid => _resUid;
+
         protected readonly AssetLoader assetLoader;
         protected readonly EventMesh eventMesh;
 
+        public string uid { get; }
+        public string resUid { get; }
         public void Create(GObject popup)
         {
-            view = (T)UIPackage.CreateObject(_pkgName, _resName);
+            var split = resUid.Split('.');
+            var pkgName = split[^2];
+            var resName = split[^1];
+            view = (T)UIPackage.CreateObject(pkgName, resName);
             view.fairyBatching = true;
             AddToRoot(popup);
         }
