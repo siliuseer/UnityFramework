@@ -7,7 +7,7 @@ namespace siliu
     {
         public sbyte ReadSbyte()
         {
-            return Convert.ToSByte(ReadByte());
+            return (sbyte)ReadByte();
         }
 
         public void WriteSByte(sbyte value)
