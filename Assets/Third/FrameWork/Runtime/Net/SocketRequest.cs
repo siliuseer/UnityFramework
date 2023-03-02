@@ -4,26 +4,26 @@ using UnityEngine;
 
 namespace siliu.net
 {
+    public enum SocketEvent
+    {
+        /// <summary>
+        /// 连接成功
+        /// </summary>
+        ConnectSuccess,
+
+        /// <summary>
+        /// 连接失败
+        /// </summary>
+        ConnectFail,
+
+        /// <summary>
+        /// 断线
+        /// </summary>
+        Disconnect,
+    }
+
     public class SocketRequest : IRequest
     {
-        public enum SocketEvent
-        {
-            /// <summary>
-            /// 连接成功
-            /// </summary>
-            ConnectSuccess,
-
-            /// <summary>
-            /// 连接失败
-            /// </summary>
-            ConnectFail,
-
-            /// <summary>
-            /// 断线
-            /// </summary>
-            Disconnect,
-        }
-
         private const int MaxRead = 1024 * 5; //单条消息上下行最大字节数
         private const int SOCKET_RECEIVE_HEAD_LEN = 7;
 

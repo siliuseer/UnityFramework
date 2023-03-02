@@ -8,15 +8,13 @@ namespace siliu.net
     {
         private WebSocket webSocket;
 
-        private const int MaxRead = 1024 * 5; //单条消息上下行最大字节数
         private const int SOCKET_RECEIVE_HEAD_LEN = 7;
-        private readonly byte[] _byteBuffer = new byte[MaxRead]; //下行缓存
         private ByteStream streamSend = new ByteStream();
         private ByteStream streamReceive = new ByteStream();
-        private Action<SocketRequest.SocketEvent> _connectEvent;
+        private Action<SocketEvent> _connectEvent;
         private Action<BaseDownEntry> _onReceive;
         
-        public WebSocketRequest(Action<SocketRequest.SocketEvent> connectCallback, Action<BaseDownEntry> receiveCallback)
+        public WebSocketRequest(Action<SocketEvent> connectCallback, Action<BaseDownEntry> receiveCallback)
         {
             _connectEvent = connectCallback;
             _onReceive = receiveCallback;
@@ -24,6 +22,7 @@ namespace siliu.net
 
         ~WebSocketRequest()
         {
+            Close();
             streamSend?.Close();
             streamSend = null;
             lock (streamReceive)
@@ -86,27 +85,118 @@ namespace siliu.net
 
         public void Connect(string wss)
         {
-            webSocket = new WebSocket(wss);
-            webSocket.OnOpen += OnOpen;
-            webSocket.OnMessage += OnMessage;
-            webSocket.OnError += OnError;
-            webSocket.OnClose += OnClose;
+            try
+            {
+                Close();
+                Debug.Log($"try connect {wss}");
+                webSocket = new WebSocket(wss);
+                webSocket.OnOpen += OnOpen;
+                webSocket.OnMessage += OnMessage;
+                webSocket.OnError += OnError;
+                webSocket.OnClose += OnClose;
+                webSocket.ConnectAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning(e);
+                _connectEvent?.Invoke(SocketEvent.ConnectFail);
+            }
+        }
+
+        public void Close()
+        {
+            webSocket?.CloseAsync();
+            webSocket = null;
         }
         
         private void OnOpen(object sender, EventArgs args)
         {
+            _connectEvent?.Invoke(SocketEvent.ConnectSuccess);
         }
 
-        private void OnError(object sender, UnityWebSocket.ErrorEventArgs args)
+        private void OnError(object sender, ErrorEventArgs args)
         {
+            Debug.Log("websocket error: "+args.Message);
         }
 
         private void OnClose(object sender, CloseEventArgs args)
         {
+            _connectEvent?.Invoke(SocketEvent.Disconnect);
         }
 
         private void OnMessage(object sender, MessageEventArgs args)
         {
+            if (!args.IsBinary)
+            {
+                return;
+            }
+
+            var bytes = args.RawData;
+            lock (streamReceive)
+            {
+                streamReceive.Append(bytes, 0, bytes.Length);
+            }
+            try
+            {
+                DealReceive();
+            }
+            catch (Exception e)
+            {
+                Debug.LogError(e);
+            }
+        }
+        
+        private void DealReceive()
+        {
+            lock (streamReceive)
+            {
+                streamReceive.SeekToBegin();
+                while (streamReceive.Available >= SOCKET_RECEIVE_HEAD_LEN)
+                {
+                    int len = streamReceive.ReadUShort();
+                    if (len - 2 > streamReceive.Available)
+                    {
+                        //如果不够消息长度,回退读取长度的2字节
+                        streamReceive.SeekOffset(-2);
+                        break;
+                    }
+
+                    var protocol = streamReceive.ReadUShort(); //协议号
+                    var flag = streamReceive.ReadUShort(); //标记
+                    var result = streamReceive.ReadSbyte(); //处理结果
+                    if (AppCfg.debug && protocol != 100)
+                    {
+                        Debug.Log($"receive proto: {protocol}, flag: {flag}, result: {result}, msg len: {len}");
+                    }
+
+                    byte[] bytes;
+                    if (result < 0)
+                    {
+                        var s = streamReceive.ReadShort();
+                        bytes = BitConverter.GetBytes(s);
+                    }
+                    else
+                    {
+                        bytes = streamReceive.ReadBytes(len - SOCKET_RECEIVE_HEAD_LEN);
+                    }
+
+                    var down = NetMgr.FindDown(protocol);
+                    if (down == null)
+                    {
+                        //Debug.LogWarning("找不到处理下行: " + protocol);
+                        continue;
+                    }
+
+                    var entry = down.CreateEntry();
+                    entry.proto = protocol.ToString();
+                    entry.flag = flag;
+                    entry.DealReceive(result, bytes);
+                    _onReceive?.Invoke(entry);
+                }
+
+                //将剩余数据移动到流开头,并调整数据流大小
+                streamReceive.ConvertToAvailable();
+            }
         }
     }
 }

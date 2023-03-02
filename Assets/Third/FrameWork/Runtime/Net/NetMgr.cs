@@ -6,19 +6,19 @@ namespace siliu.net
 {
     public class NetMgr : MonoBehaviour
     {
-        private static NetMgr _inst;
+        private static NetMgr inst;
 
         public static NetMgr Inst
         {
             get
             {
-                if (_inst != null) return _inst;
+                if (inst != null) return inst;
 
                 var go = new GameObject("[NetMgr]");
                 DontDestroyOnLoad(go);
-                _inst = go.AddComponent<NetMgr>();
+                inst = go.AddComponent<NetMgr>();
 
-                return _inst;
+                return inst;
             }
         }
 
@@ -49,9 +49,9 @@ namespace siliu.net
         }
 
         private HttpRequest _http;
-        private SocketRequest _socket;
-        private List<SendEntry> _sendList = new List<SendEntry>();
-        private List<BaseDownEntry> _receiveList = new List<BaseDownEntry>();
+        private WebSocketRequest _socket;
+        private readonly List<SendEntry> _sendList = new List<SendEntry>();
+        private readonly List<BaseDownEntry> _receiveList = new List<BaseDownEntry>();
 
         public Action SocketConnectSuccess;
         public Action SocketConnectFail;
@@ -60,10 +60,10 @@ namespace siliu.net
         private long _lastSendTime;
         private bool _socketConnected;
 
-        public void Connect(string ip, int port)
+        public void ConnectWss(string wss)
         {
             _lastSendTime = ServerTime.Now;
-            _socket?.Connect(ip, port);
+            _socket.Connect(wss);
         }
 
         public void Send(SendEntry msg)
@@ -102,24 +102,24 @@ namespace siliu.net
         private void Awake()
         {
             _http = new HttpRequest(AppCfg.url, OnReceive);
-            _socket = new SocketRequest(e =>
+            _socket = new WebSocketRequest(e =>
             {
                 switch (e)
                 {
-                    case SocketRequest.SocketEvent.ConnectSuccess:
+                    case SocketEvent.ConnectSuccess:
                     {
                         _lastSendTime = ServerTime.Now;
                         SocketConnectSuccess?.Invoke();
                         _socketConnected = true;
                         break;
                     }
-                    case SocketRequest.SocketEvent.ConnectFail:
+                    case SocketEvent.ConnectFail:
                     {
                         _socketConnected = false;
                         SocketConnectFail?.Invoke();
                         break;
                     }
-                    case SocketRequest.SocketEvent.Disconnect:
+                    case SocketEvent.Disconnect:
                     {
                         _socketConnected = false;
                         SocketDisconnect?.Invoke();
