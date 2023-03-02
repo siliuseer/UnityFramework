@@ -48,8 +48,11 @@ namespace siliu.net
 
             streamSend?.Close();
             streamSend = null;
-            streamReceive?.Close();
-            streamReceive = null;
+            lock (streamReceive)
+            {
+                streamReceive?.Close();
+                streamReceive = null;
+            }
 
             _connectEvent = null;
             _onReceive = null;

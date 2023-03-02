@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Douyin;
+using DouyinPb;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.GZip;
 using Newtonsoft.Json.Linq;
@@ -88,7 +88,7 @@ namespace siliu
                 var buf = new byte[1024 * 4];
                 StreamUtils.Copy(gZipInputStream, outStream, buf);
                 var dataBytes = outStream.ToArray();
-                var response = Douyin.Response.Parser.ParseFrom(dataBytes);
+                var response = DouyinPb.Response.Parser.ParseFrom(dataBytes);
                 foreach (var message in response.Messages)
                 {
                     DecodeMessage(message);

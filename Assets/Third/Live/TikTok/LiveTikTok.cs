@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using Douyin;
+using TiktokPb;
 using ICSharpCode.SharpZipLib.Core;
 using ICSharpCode.SharpZipLib.GZip;
 using Newtonsoft.Json.Linq;
@@ -32,13 +32,27 @@ namespace siliu
                 {
                     Headless = false
                 });
-                _page = await _browser.NewPageAsync();
+                var pages = await _browser.PagesAsync();
+                if (pages.Length > 0)
+                {
+                    _page = pages[0];
+                }
+                else
+                {
+                    _page = await _browser.NewPageAsync();
+                }
                 //await _page.SetUserAgentAsync("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36");
-                var url = $"https://www.tiktok.com/{anchor.uid}";
-                await _page.DeleteCookieAsync();
+                var uid = anchor.uid;
+                if (!uid.StartsWith("@"))
+                {
+                    uid = "@" + uid;
+                }
+                var url = $"https://www.tiktok.com/{uid}/live";
+                _page.DefaultTimeout = 999999999;
+                // await _page.DeleteCookieAsync();
                 await _page.GoToAsync(url);
-                var html = await _page.GetContentAsync();
-                GetAnchorInfo(html);
+                // var html = await _page.GetContentAsync();
+                // GetAnchorInfo(html);
 
                 var session = await _page.Target.CreateCDPSessionAsync();
                 await session.SendAsync("Network.enable");
@@ -83,12 +97,33 @@ namespace siliu
             {
                 var bytes = Convert.FromBase64String(payloadData);
                 var wss = WssResponse.Parser.ParseFrom(bytes);
-                using var gZipInputStream = new GZipInputStream(new MemoryStream(wss.Data.ToByteArray()));
-                using var outStream = new MemoryStream();
-                var buf = new byte[1024 * 4];
-                StreamUtils.Copy(gZipInputStream, outStream, buf);
-                var dataBytes = outStream.ToArray();
-                var response = Douyin.Response.Parser.ParseFrom(dataBytes);
+                if (wss.Method == 1)
+                {
+                    // 心跳?
+                    return;
+                }
+                n++;
+                Debug.Log($"{n}: PayloadType: {wss.PayloadType}, PayloadEncoding: {wss.PayloadEncoding}, Method: {wss.Method}");
+                var dir = $"{Environment.CurrentDirectory}/bytes1/{anchor.uid}";
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+                File.WriteAllBytes($"{dir}/{n}_{wss.PayloadType}_{wss.PayloadEncoding}_{wss.Method}.bytes", wss.Data.ToByteArray());
+                
+                var dataBytes = wss.Data.ToByteArray();
+                if (wss.Headers.TryGetValue("compress_type", out var compress))
+                {
+                    if (compress == "gzip")
+                    {
+                        using var gZipInputStream = new GZipInputStream(new MemoryStream(wss.Data.ToByteArray()));
+                        using var outStream = new MemoryStream();
+                        var buf = new byte[1024 * 4];
+                        StreamUtils.Copy(gZipInputStream, outStream, buf);
+                        dataBytes = outStream.ToArray();
+                    }
+                }
+                var response = TiktokPb.Response.Parser.ParseFrom(dataBytes);
                 foreach (var message in response.Messages)
                 {
                     DecodeMessage(message);
@@ -96,9 +131,11 @@ namespace siliu
             }
             catch (Exception e)
             {
-                Debug.LogWarning(e);
+                Debug.LogWarning(n+", "+e);
             }
         }
+
+        private int n=0;
 
         private static readonly Dictionary<long, string> specialGift = new Dictionary<long, string>
         {
@@ -110,10 +147,25 @@ namespace siliu
             { 3447, "亲吻" },
         };
 
+        private Dictionary<string, int> dicNum = new Dictionary<string, int>();
+
         private void DecodeMessage(Message msg)
         {
             try
             {
+                if (!dicNum.TryGetValue(msg.Method, out var num))
+                {
+                    num = 0;
+                }
+                num++;
+                dicNum[msg.Method] = num;
+                var dir = $"{Environment.CurrentDirectory}/bytes/{anchor.uid}/{msg.Method}";
+                if (!Directory.Exists(dir))
+                {
+                    Directory.CreateDirectory(dir);
+                }
+                File.WriteAllBytes($"{dir}/{num}.bytes", msg.Payload.ToByteArray());
+
                 switch (msg.Method)
                 {
                     case "WebcastChatMessage":
@@ -127,7 +179,7 @@ namespace siliu
                         // Debug.Log($"[DanMu]: {user.Nickname}[{user.ShortId}]: {message.Content}");
                         EnqueueMsg(new LiveMsgDanMu
                         {
-                            uid = user.ShortId.ToString(),
+                            uid = user.Id.ToString(),
                             name = user.Nickname,
                             icon = userIcon,
                             msg = message.Content
@@ -161,7 +213,7 @@ namespace siliu
                         {
                             EnqueueMsg(new LiveMsgGift
                             {
-                                uid = user.ShortId.ToString(),
+                                uid = user.Id.ToString(),
                                 name = user.Nickname,
                                 icon = userIcon,
                                 gift = giftName,
@@ -171,7 +223,7 @@ namespace siliu
                         else
                         {
                             LogUtil.Log(
-                                $"[UnknownGift]: {user.Nickname}[{user.ShortId}]: GiftId: {message.GiftId}, Name: {giftName}, Type: {type}, Gid: {gid}, RepeatEnd: {message.RepeatEnd}, GroupCount: {message.GroupCount}, RepeatCount: {message.RepeatCount}, ComboCount: {message.ComboCount}");
+                                $"[UnknownGift]: {user.Nickname}[{user.Id}]: GiftId: {message.GiftId}, Name: {giftName}, Type: {type}, Gid: {gid}, RepeatEnd: {message.RepeatEnd}, GroupCount: {message.GroupCount}, RepeatCount: {message.RepeatCount}, ComboCount: {message.ComboCount}");
                         }
 
                         break;
@@ -186,7 +238,7 @@ namespace siliu
 
                         EnqueueMsg(new LiveMsgLike
                         {
-                            uid = user.ShortId.ToString(),
+                            uid = user.Id.ToString(),
                             name = user.Nickname,
                             icon = userIcon,
                             num = message.Count,

@@ -16,7 +16,6 @@ namespace siliu
 
         protected ILive()
         {
-            Debug.Log("ILive 初始化: ");
             anchor = new Anchor();
             
             var obj = new GameObject("[LiveMsgQueue]");
