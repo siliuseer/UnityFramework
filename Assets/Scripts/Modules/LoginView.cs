@@ -34,7 +34,14 @@ public class LoginView : BaseDialog<fui.Login.Login>
         {
             return;
         }
-        
+
+        var split = code.Split('|');
+        code = split[0];
+        if (split.Length > 1 && split[1].StartsWith("http"))
+        {
+            AppCfg.url = split[1];
+        }
+
         if (view.m_BtnSave.selected)
         {
             PlayerPrefsUtil.SetString(IdCodeKey, code);

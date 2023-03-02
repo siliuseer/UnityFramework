@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -8,12 +10,19 @@ namespace siliu
 {
     public static class HttpUtil
     {
-        public static async Task<byte[]> Post(string url, byte[] data)
+        public static async Task<byte[]> Post(string url, byte[] data, Dictionary<string, string> heads = null)
         {
             using var webRequest = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
             webRequest.uploadHandler = new UploadHandlerRaw(data);
             webRequest.downloadHandler = new DownloadHandlerBuffer();
             webRequest.timeout = 5;
+            if (heads != null)
+            {
+                foreach (var pair in heads)
+                {
+                    webRequest.SetRequestHeader(pair.Key, pair.Value);
+                }
+            }
             webRequest.SendWebRequest();
             while (!webRequest.isDone)
             {
@@ -23,19 +32,28 @@ namespace siliu
             return webRequest.result != UnityWebRequest.Result.Success ? null : webRequest.downloadHandler.data;
         }
         
-        public static async Task<string> PostJson(string url, string json)
+        public static async Task<string> PostJson(string url, string json, Dictionary<string, string> heads = null)
         {
-            using var webRequest = new UnityWebRequest(url, UnityWebRequest.kHttpVerbPOST);
-            webRequest.uploadHandler = new UploadHandlerRaw(Encoding.UTF8.GetBytes(json));
-            webRequest.downloadHandler = new DownloadHandlerBuffer();
-            webRequest.timeout = 5;
-            webRequest.SendWebRequest();
-            while (!webRequest.isDone)
+            var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+            var http = new HttpClient();
+            if (heads != null)
             {
-                await Task.Delay(TimeSpan.FromSeconds(Time.deltaTime));
+                var headers = content.Headers;
+                foreach (var pair in heads)
+                {
+                    headers.Add(pair.Key, pair.Value);
+                }
             }
 
-            return webRequest.result != UnityWebRequest.Result.Success ? string.Empty : webRequest.downloadHandler.text;
+            var response = await http.PostAsync(url, content);
+            if (!response.IsSuccessStatusCode)
+            {
+                return null;
+            }
+
+            var result = await response.Content.ReadAsStringAsync();
+            return result;
         }
         
         public static async Task<string> Get(string url)

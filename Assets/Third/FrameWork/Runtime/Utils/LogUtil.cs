@@ -47,9 +47,9 @@ namespace siliu
             var line = $"[{type}] {condition}";
             UnityEngine.Debug.unityLogger.Log(type, line);
             _writer.WriteLine($"[{DateTime.Now:yyyy-MM-dd HH:mm:ss}] {line}");
-            var trace = new StackTrace(2, true);
-            _writer.WriteLine(trace.ToString());
-            _writer.Flush();
+            // var trace = new StackTrace(2, true);
+            // _writer.WriteLine(trace.ToString());
+            // _writer.Flush();
         }
     }
 }
