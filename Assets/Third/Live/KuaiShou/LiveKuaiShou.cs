@@ -3,7 +3,7 @@ using System.IO;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 using UnityEngine;
-using WebSocketSharp;
+using UnityWebSocket;
 
 namespace siliu
 {
@@ -74,7 +74,7 @@ namespace siliu
             connected = true;
         }
 
-        private void OnError(object sender, WebSocketSharp.ErrorEventArgs args)
+        private void OnError(object sender, UnityWebSocket.ErrorEventArgs args)
         {
             Debug.Log("弹幕助手报错: " + args.Exception);
         }

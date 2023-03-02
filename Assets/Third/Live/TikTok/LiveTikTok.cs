@@ -34,7 +34,7 @@ namespace siliu
                 });
                 _page = await _browser.NewPageAsync();
                 //await _page.SetUserAgentAsync("Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/106.0.0.0 Safari/537.36");
-                var url = $"https://live.douyin.com/{anchor.uid}";
+                var url = $"https://www.tiktok.com/{anchor.uid}";
                 await _page.DeleteCookieAsync();
                 await _page.GoToAsync(url);
                 var html = await _page.GetContentAsync();
